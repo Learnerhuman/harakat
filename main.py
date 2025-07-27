@@ -11,7 +11,6 @@ import os
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
-ADMIN_ID = 6238734044
 # Fayl nomi
 DATA_FILE = 'users.json'
 
@@ -194,7 +193,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # /admin
 async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
+    if int(update.effective_user.id) != ADMIN_ID:
         await update.message.reply_text("Faqat admin uchun.\nAgar admin bo'lsangiz /admin")
         return
     data = load_data()
@@ -202,6 +201,44 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for user_id, v in data.items():
         text += f"{v['full_name']} | {v['phone']} | {v['direction']} | {v['score']}\n"
     await update.message.reply_text(text+"\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nAgar admin bo'lsangiz /admin")
+
+# /admin_delete - Admin foydalanuvchini o'chirishi mumkin
+async def admin_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("❌ Bu buyruq faqat admin uchun.")
+        return
+
+    data = load_data()
+    if not data:
+        await update.message.reply_text("Ro'yxatda hech qanday foydalanuvchi yo'q.")
+        return
+
+    keyboard = []
+    for user_id, v in data.items():
+        btn_text = f"{v['full_name']} ({v['direction']}, {v['score']})"
+        keyboard.append([InlineKeyboardButton(f"❌ {btn_text}", callback_data=f"del:{user_id}")])
+
+    await update.message.reply_text("Qaysi foydalanuvchini o'chirmoqchisiz?",
+                                    reply_markup=InlineKeyboardMarkup(keyboard))
+# Admin tugmani bosganda foydalanuvchini ro'yxatdan chiqaradi
+async def delete_user_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if str(update.effective_user.id) != ADMIN_ID:
+        await query.edit_message_text("❌ Ruxsat yo'q.")
+        return
+
+    user_id = query.data.split(":")[1]
+    data = load_data()
+
+    if user_id in data:
+        full_name = data[user_id]['full_name']
+        del data[user_id]
+        save_data(data)
+        await query.edit_message_text(f"✅ {full_name} ro'yxatdan chiqarildi.")
+    else:
+        await query.edit_message_text("Foydalanuvchi topilmadi.")
 
 # Asosiy
 if __name__ == '__main__':
@@ -234,6 +271,8 @@ if __name__ == '__main__':
     app.add_handler(CallbackQueryHandler(reyting_direction, pattern="^r:.*"))
     app.add_handler(CommandHandler("admin", admin))
     app.add_handler(CommandHandler("cancel", cancel))
+    app.add_handler(CommandHandler("admin_delete", admin_delete))
+    app.add_handler(CallbackQueryHandler(delete_user_callback, pattern="^del:.*"))
 
 
     app.run_polling()
