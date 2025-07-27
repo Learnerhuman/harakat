@@ -229,7 +229,7 @@ async def function(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if int(update.effective_user.id) != ADMIN_ID:
         await update.message.reply_text("Faqat admin uchun.\nRo'yhatdan o'tish uchun /start\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit")
     else:
-        await update.message.reply_text("Function bo'limi:\nRo'yhatdan o'tish uchun /start\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFoydalanuvchilar ro'yhati /all\nRo'yhatdan chiqish /cancel\nFoydalanuvchilarni o'chirish /delete")
+        await update.message.reply_text("Function bo'limi:\nRo'yhatdan o'tish uchun /start\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFoydalanuvchilar ro'yhati /all\nFoydalanuvchilarni o'chirish /delete")
 
 # Asosiy
 if __name__ == '__main__':
