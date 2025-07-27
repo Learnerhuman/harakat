@@ -48,7 +48,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     data = load_data()
     if user_id in data:
-        await update.message.reply_text("Siz allaqachon ro'yhatdan o'tgansiz.\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit")
+        await update.message.reply_text("Siz allaqachon ro'yhatdan o'tgansiz.\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFunction bo'limi: /function")
     else:
         await update.message.reply_text("Telefon raqamingizni yuboring:",
             reply_markup=ReplyKeyboardMarkup(
@@ -102,7 +102,7 @@ async def enter_score(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "score": score
     }
     save_data(data)
-    await update.message.reply_text("Ma'lumotlaringiz saqlandi!\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nAgar admin bo'lsangiz /admin")
+    await update.message.reply_text("Ma'lumotlaringiz saqlandi!\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFunction bo'limi: /function")
     return ConversationHandler.END
 
 # /reyting
@@ -123,14 +123,14 @@ async def reyting_direction(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = f"📊 <b>{direction}</b> yo'nalishi reytingi:\n"
     for i, (name, score) in enumerate(sorted_data, 1):
         text += f"{i}. {name} - {score}\n"
-    await query.edit_message_text(text+"\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nAgar admin bo'lsangiz /admin", parse_mode='HTML')
+    await query.edit_message_text(text+"\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFunction bo'limi: /function", parse_mode='HTML')
 
 # /edit
 async def edit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     data = load_data()
     if user_id not in data:
-        await update.message.reply_text("Siz ro'yhatdan o'tmagansiz.\nRo'yhatdan o'tish uchun /start\nAgar admin bo'lsangiz /admin")
+        await update.message.reply_text("Siz ro'yhatdan o'tmagansiz.\nRo'yhatdan o'tish uchun /start\nFunction bo'limi: /function")
         return
     keyboard = [
         [InlineKeyboardButton("Ism", callback_data="field:full_name")],
@@ -161,10 +161,10 @@ async def edit_value_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     field = context.user_data['edit_field']
     if update.callback_query:
         value = update.callback_query.data.split(":")[1]
-        await update.callback_query.edit_message_text("O'zgartirildi.\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nAgar admin bo'lsangiz /admin")
+        await update.callback_query.edit_message_text("O'zgartirildi.\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFunction bo'limi: /function")
     else:
         value = update.message.text
-        await update.message.reply_text("O'zgartirildi.\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nAgar admin bo'lsangiz /admin")
+        await update.message.reply_text("O'zgartirildi.\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFunction bo'limi: /function")
 
     if field == "score":
         try:
@@ -185,23 +185,22 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id in data:
         del data[user_id]
         save_data(data)
-        await update.message.reply_text("❌ Siz ro'yxatdan chiqarildingiz.\nYangi ro'yxatdan o'tish uchun /start buyrug'ini bering.\nAgar admin bo'lsangiz /admin")
+        await update.message.reply_text("❌ Siz ro'yxatdan chiqarildingiz.\nYangi ro'yxatdan o'tish uchun /start buyrug'ini bering.\nFunction bo'limi: /function")
     else:
-        await update.message.reply_text("Siz ro'yxatdan o'tmagansiz. Ro'yxatdan o'tish uchun /start buyrug'ini bering.\nAgar admin bo'lsangiz /admin")
+        await update.message.reply_text("Siz ro'yxatdan o'tmagansiz. Ro'yxatdan o'tish uchun /start buyrug'ini bering.\nFunction bo'limi: /function")
     
     return ConversationHandler.END
 
 # /admin
 async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if int(update.effective_user.id) != ADMIN_ID:
-        await update.message.reply_text("Faqat admin uchun.\nAgar admin bo'lsangiz /admin")
+        await update.message.reply_text("Faqat admin uchun.")
         return
     data = load_data()
-    text = "👮 Admin panel:\n"
+    text = "👮 Foydalanuvchilar ro'yhati:\n"
     for user_id, v in data.items():
         text += f"{v['full_name']} | {v['phone']} | {v['direction']} | {v['score']}\n"
-    await update.message.reply_text(text+"\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nAgar admin bo'lsangiz /admin")
-
+    await update.message.reply_text(f"{text}\nFunction bo'limi: /function")
 # /admin_delete - Admin foydalanuvchini o'chirishi mumkin
 async def admin_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if int(update.effective_user.id) != ADMIN_ID:
@@ -210,7 +209,7 @@ async def admin_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = load_data()
     if not data:
-        await update.message.reply_text("Ro'yxatda hech qanday foydalanuvchi yo'q.")
+        await update.message.reply_text("Ro'yxatda hech qanday foydalanuvchi yo'q.\nFunction bo'limi: /function")
         return
 
     keyboard = []
@@ -236,9 +235,15 @@ async def delete_user_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         full_name = data[user_id]['full_name']
         del data[user_id]
         save_data(data)
-        await query.edit_message_text(f"✅ {full_name} ro'yxatdan chiqarildi.")
+        await query.edit_message_text(f"✅ {full_name} ro'yxatdan chiqarildi.\nFunction bo'limi: /function")
     else:
-        await query.edit_message_text("Foydalanuvchi topilmadi.")
+        await query.edit_message_text("Foydalanuvchi topilmadi.\nFunction bo'limi: /function")
+#funksiya
+async def function(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if int(update.effective_user.id) != ADMIN_ID:
+        await update.message.reply_text("Faqat admin uchun.\nRo'yhatdan o'tish uchun /start\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit")
+    else:
+        await update.message.reply_text("Function bo'limi:\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFoydalanuvchilar ro'yhati /all\nRo'yhatdan chiqish /cancel\nFoydalanuvchilarni o'chirish /delete")
 
 # Asosiy
 if __name__ == '__main__':
@@ -269,10 +274,11 @@ if __name__ == '__main__':
     app.add_handler(edit_conv)
     app.add_handler(CommandHandler("reyting", reyting))
     app.add_handler(CallbackQueryHandler(reyting_direction, pattern="^r:.*"))
-    app.add_handler(CommandHandler("admin", admin))
+    app.add_handler(CommandHandler("all", admin))
     app.add_handler(CommandHandler("cancel", cancel))
-    app.add_handler(CommandHandler("admin_delete", admin_delete))
+    app.add_handler(CommandHandler("delete", admin_delete))
     app.add_handler(CallbackQueryHandler(delete_user_callback, pattern="^del:.*"))
+    app.add_handler(CommandHandler("function", function))
 
 
     app.run_polling()
