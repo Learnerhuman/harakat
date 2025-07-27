@@ -11,7 +11,6 @@ import os
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = os.getenv("ADMIN_ID")
-ADMIN_ID=6238734044
 # Fayl nomi
 DATA_FILE = 'users.json'
 

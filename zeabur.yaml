@@ -1,9 +1,6 @@
-project: telegram-bot
-services:
-  bot:
-    build:
-      type: python
-      entry: main.py
-    env:
-      - name: BOT_TOKEN
-        value: 8402154294:AAFicgKufzqSaWOnMTC6PvyMLnRPViBKX7k
+name: telegram-reyting-bot
+type: python
+build:
+  command: pip install -r requirements.txt
+start:
+  command: python main.py
