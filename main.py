@@ -177,20 +177,6 @@ async def edit_value_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data[user_id][field] = value
     save_data(data)
     return ConversationHandler.END
-# /cancel - ro'yxatdan chiqarish
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = str(update.effective_user.id)
-    data = load_data()
-
-    if user_id in data:
-        del data[user_id]
-        save_data(data)
-        await update.message.reply_text("❌ Siz ro'yxatdan chiqarildingiz.\nYangi ro'yxatdan o'tish uchun /start buyrug'ini bering.\nFunction bo'limi: /function")
-    else:
-        await update.message.reply_text("Siz ro'yxatdan o'tmagansiz. Ro'yxatdan o'tish uchun /start buyrug'ini bering.\nFunction bo'limi: /function")
-    
-    return ConversationHandler.END
-
 # /admin
 async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if int(update.effective_user.id) != ADMIN_ID:
@@ -243,7 +229,7 @@ async def function(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if int(update.effective_user.id) != ADMIN_ID:
         await update.message.reply_text("Faqat admin uchun.\nRo'yhatdan o'tish uchun /start\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit")
     else:
-        await update.message.reply_text("Function bo'limi:\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFoydalanuvchilar ro'yhati /all\nRo'yhatdan chiqish /cancel\nFoydalanuvchilarni o'chirish /delete")
+        await update.message.reply_text("Function bo'limi:\nRo'yhatdan o'tish uchun /start\nReytinglarni ko'rish uchun /reyting\nMa'lumotni o'zgartirish uchun /edit\nFoydalanuvchilar ro'yhati /all\nRo'yhatdan chiqish /cancel\nFoydalanuvchilarni o'chirish /delete")
 
 # Asosiy
 if __name__ == '__main__':
@@ -257,7 +243,7 @@ if __name__ == '__main__':
             SELECT_DIRECTION: [CallbackQueryHandler(select_direction)],
             ENTER_SCORE: [MessageHandler(filters.TEXT & ~filters.COMMAND, enter_score)]
         },
-        fallbacks=[CommandHandler("cancel", cancel)]
+        fallbacks=[]
     )
 
     edit_conv = ConversationHandler(
@@ -267,7 +253,7 @@ if __name__ == '__main__':
             EDIT_VALUE_INPUT: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_value_input),
                                CallbackQueryHandler(edit_value_input, pattern="^dir:.*")]
         },
-        fallbacks=[CommandHandler("cancel", cancel)]
+        fallbacks=[]
     )
 
     app.add_handler(conv_handler)
@@ -275,7 +261,6 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("reyting", reyting))
     app.add_handler(CallbackQueryHandler(reyting_direction, pattern="^r:.*"))
     app.add_handler(CommandHandler("all", admin))
-    app.add_handler(CommandHandler("cancel", cancel))
     app.add_handler(CommandHandler("delete", admin_delete))
     app.add_handler(CallbackQueryHandler(delete_user_callback, pattern="^del:.*"))
     app.add_handler(CommandHandler("function", function))
