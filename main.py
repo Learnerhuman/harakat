@@ -204,7 +204,7 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # /admin_delete - Admin foydalanuvchini o'chirishi mumkin
 async def admin_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
+    if int(update.effective_user.id) != ADMIN_ID:
         await update.message.reply_text("❌ Bu buyruq faqat admin uchun.")
         return
 
