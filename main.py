@@ -225,7 +225,7 @@ async def delete_user_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     query = update.callback_query
     await query.answer()
 
-    if str(update.effective_user.id) != ADMIN_ID:
+    if int(update.effective_user.id) != ADMIN_ID:
         await query.edit_message_text("❌ Ruxsat yo'q.")
         return
 
